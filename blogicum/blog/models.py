@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 
 from core.models import IsPublishedCreatedAt
-from blog.const import CHAR_LENGTH, NAME_LENGTH_LIMIT
+from .const import CHAR_LENGTH, NAME_LENGTH_LIMIT
 
 User = get_user_model()
 

@@ -2,12 +2,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.paginator import Paginator
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import now
 from django.urls import reverse
 from django.views.generic import UpdateView, CreateView, DeleteView
-
-from django.db.models import Count
 
 from .forms import CommentForm, ProfileForm, PostForm
 from .models import Category, Comment, Post, User
@@ -130,7 +129,7 @@ class OnlyAuthorMixin(UserPassesTestMixin):
     def test_func(self):
         object = self.get_object()
         return object.author == self.request.user
-    
+
     def handle_no_permission(self):
         object = self.get_object()
         return redirect('blog:post_detail', object.id)
@@ -168,7 +167,8 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'post_id': self.cur_post.pk})
+        return reverse('blog:post_detail',
+                       kwargs={'post_id': self.cur_post.pk})
 
 
 class CommentUpdateView(OnlyAuthorMixin, UpdateView):
@@ -184,7 +184,8 @@ class CommentUpdateView(OnlyAuthorMixin, UpdateView):
     template_name = 'blog/comment.html'
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'post_id': self.cur_post.pk})
+        return reverse('blog:post_detail',
+                       kwargs={'post_id': self.cur_post.pk})
 
 
 class CommentDeleteView(OnlyAuthorMixin, DeleteView):
@@ -200,4 +201,5 @@ class CommentDeleteView(OnlyAuthorMixin, DeleteView):
     template_name = 'blog/comment.html'
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'post_id': self.cur_post.pk})
+        return reverse('blog:post_detail',
+                       kwargs={'post_id': self.cur_post.pk})
