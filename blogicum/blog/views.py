@@ -137,9 +137,10 @@ class OnlyAuthorMixin(UserPassesTestMixin):
 
 class PostUpdateView(OnlyAuthorMixin, UpdateView):
     model = Post
+    pk_url_kwarg = 'post_id'
     form_class = PostForm
     template_name = 'blog/create.html'
-
+    
     def get_success_url(self):
         return reverse('blog:post_detail', kwargs={'post_id': self.object.pk})
 

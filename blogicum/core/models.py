@@ -1,7 +1,18 @@
 from django.db import models
 
 
-class IsPublishedCreatedAt(models.Model):
+class CreatedAt(models.Model):
+    """Абстрактная модель. Добавляет дату создания записи"""
+
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      verbose_name='Добавлено')
+
+    class Meta:
+        abstract = True
+        ordering = ('created_at',)
+
+
+class IsPublishedCreatedAt(CreatedAt):
     """Абстрактная модель. Добавляет флаг is_published.
     и дату создания записи.
     """
@@ -10,8 +21,6 @@ class IsPublishedCreatedAt(models.Model):
                                        verbose_name='Опубликовано',
                                        help_text='Снимите галочку,'
                                        ' чтобы скрыть публикацию.')
-    created_at = models.DateTimeField(auto_now_add=True,
-                                      verbose_name='Добавлено')
 
     class Meta:
         abstract = True

@@ -2,15 +2,20 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 
-from core.models import IsPublishedCreatedAt
+from core.models import CreatedAt, IsPublishedCreatedAt
 from .const import CHAR_LENGTH, NAME_LENGTH_LIMIT
 
 User = get_user_model()
 
 
 class Category(IsPublishedCreatedAt):
-    title = models.CharField(max_length=CHAR_LENGTH, verbose_name='Заголовок')
-    description = models.TextField(verbose_name='Описание')
+    title = models.CharField(
+        max_length=CHAR_LENGTH,
+        verbose_name='Заголовок'
+    )
+    description = models.TextField(
+        verbose_name='Описание'
+    )
     slug = models.SlugField(
         unique=True, verbose_name='Идентификатор',
         help_text='Идентификатор страницы для URL; разрешены символы '
@@ -26,8 +31,10 @@ class Category(IsPublishedCreatedAt):
 
 
 class Location(IsPublishedCreatedAt):
-    name = models.CharField(max_length=CHAR_LENGTH,
-                            verbose_name='Название места')
+    name = models.CharField(
+        max_length=CHAR_LENGTH,
+        verbose_name='Название места'
+    )
 
     class Meta:
         verbose_name = 'местоположение'
@@ -38,13 +45,24 @@ class Location(IsPublishedCreatedAt):
 
 
 class Post(IsPublishedCreatedAt):
-    title = models.CharField(max_length=CHAR_LENGTH, verbose_name='Название')
-    text = models.TextField('Текст')
-    pub_date = models.DateTimeField('Дата и время публикации',
-                                    help_text='Если установить дату и время в '
-                                    'будущем — можно делать отложенные '
-                                    'публикации.')
-    image = models.ImageField('Фото', upload_to='posts_images', blank=True)
+    title = models.CharField(
+        max_length=CHAR_LENGTH,
+        verbose_name='Название'
+    )
+    text = models.TextField(
+        'Текст'
+    )
+    pub_date = models.DateTimeField(
+        'Дата и время публикации',
+        help_text='Если установить дату и время в '
+        'будущем — можно делать отложенные '
+        'публикации.'
+    )
+    image = models.ImageField(
+        'Фото',
+        upload_to='posts_images',
+        blank=True
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -73,21 +91,32 @@ class Post(IsPublishedCreatedAt):
         verbose_name_plural = 'Публикации'
 
     def get_absolute_url(self):
-        return reverse("blog:profile", kwargs={"username": self.author})
+        return reverse('blog:profile',
+                       kwargs={'username': self.author.username})
 
     def __str__(self):
         return self.title[:NAME_LENGTH_LIMIT]
 
 
-class Comment(models.Model):
-    text = models.TextField('Текст комментария')
+class Comment(CreatedAt):
+    text = models.TextField(
+        'Текст комментария'
+    )
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
         related_name='comments',
+        verbose_name='Публикация'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор'
+    )
 
-    class Meta:
-        ordering = ('created_at',)
+    class Meta(CreatedAt.Meta):
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self.text[:NAME_LENGTH_LIMIT]

@@ -5,13 +5,19 @@ from django.conf.urls.static import static
 from django.urls import include, path, reverse_lazy
 from django.views.generic.edit import CreateView
 
+# from .views import UserCreateView
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('blog.urls', namespace='blog')),
-    path('pages/', include('pages.urls', namespace='pages')),
-    path('auth/', include('django.contrib.auth.urls')),
-    path(
+    path('admin/',
+         admin.site.urls),
+    path('',
+         include('blog.urls', namespace='blog')),
+    path('pages/',
+         include('pages.urls', namespace='pages')),
+    path('auth/',
+         include('django.contrib.auth.urls')),
+    path( 
         'auth/registration/',
         CreateView.as_view(
             template_name='registration/registration_form.html',
