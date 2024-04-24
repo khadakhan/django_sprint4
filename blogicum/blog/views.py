@@ -34,6 +34,7 @@ def profile_username(request, username):
 # в шаблоне profile нет аргумента в ссылке на редактирование профиля!!!
 # Оставляю как было.
 
+
 def edit_profile_username(request):
     instance = get_object_or_404(
         User,
@@ -45,7 +46,7 @@ def edit_profile_username(request):
         form.save()
 
     return render(request, 'blog/user.html', context)
-#----------------------------------------------------------------------------
+
 
 def index(request):
     return render(
@@ -112,26 +113,26 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 
 class PostUpdateView(PostMixin, UpdateView):
-    
+
     def get_success_url(self):
         return reverse('blog:post_detail', kwargs={'post_id': self.object.pk})
 
 
 class PostDeleteView(PostMixin, DeleteView):
     pass
-    
+
 
 class CommentCreateView(CommentMixin, CreateView):
-    
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = self.cur_post
         return super().form_valid(form)
 
-    
+
 class CommentUpdateView(CommentMixin, OnlyAuthorMixin, UpdateView):
     pass
-    
+
 
 class CommentDeleteView(CommentMixin, OnlyAuthorMixin, DeleteView):
     pass

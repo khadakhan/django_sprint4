@@ -18,14 +18,14 @@ class PostMixin(LoginRequiredMixin, OnlyAuthorMixin):
     pk_url_kwarg = 'post_id'
     form_class = PostForm
     template_name = 'blog/create.html'
-    
+
     def handle_no_permission(self):
         return redirect('blog:post_detail', self.get_object().id)
 
     def get_success_url(self):
         return reverse('blog:profile', kwargs={'username': self.object.author})
 
-    def get_context_data(self, **kwargs):   
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = PostForm(instance=self.object)
         return context

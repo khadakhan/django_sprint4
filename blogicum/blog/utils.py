@@ -15,7 +15,7 @@ def posts_filtered_by_published(manager_of_posts):
 def posts_annotate(posts):
     return posts.annotate(
         comment_count=Count('comments')
-        )
+    )
 
 
 def posts_pagination(posts, request):
