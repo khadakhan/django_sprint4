@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.urls import include, path, reverse_lazy
 from django.views.generic.edit import CreateView
 
-# from .views import UserCreateView
+from . import views
 
 
 urlpatterns = [
@@ -17,15 +17,9 @@ urlpatterns = [
          include('pages.urls', namespace='pages')),
     path('auth/',
          include('django.contrib.auth.urls')),
-    path( 
-        'auth/registration/',
-        CreateView.as_view(               # не удалось вынести в отдельный файл view
-            template_name='registration/registration_form.html',
-            form_class=UserCreationForm,
-            success_url=reverse_lazy('blog:index'),
-        ),
-        name='registration',
-    ),
+    path('auth/registration/',
+         views.RegistrationCreateView.as_view(),
+         name='registration'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

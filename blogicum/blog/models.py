@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
+# from django.utils import timezone
+# from datetime import datetime
 
 from core.models import CreatedAt, IsPublishedCreatedAt
 from .const import CHAR_LENGTH, NAME_LENGTH_LIMIT
@@ -55,7 +56,6 @@ class Post(IsPublishedCreatedAt):
     )
     pub_date = models.DateTimeField(
         'Дата и время публикации',
-        default=timezone.now(),  # чтобы автоматом устанавливалось текущее время
         help_text='Если установить дату и время в '
         'будущем — можно делать отложенные '
         'публикации.'

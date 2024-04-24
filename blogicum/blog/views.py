@@ -1,15 +1,10 @@
-# from typing import Any
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.core.paginator import Paginator
-from django.db.models import Count
-from django.shortcuts import get_object_or_404, render, redirect
-from django.utils.timezone import now
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import UpdateView, CreateView, DeleteView
 
 from .forms import CommentForm, ProfileForm, PostForm
-from .models import Category, Comment, Post, User
+from .models import Category, Post, User
 from .utils import (posts_filtered_by_published, posts_annotate,
                     posts_pagination)
 from .mixin import OnlyAuthorMixin, PostMixin, CommentMixin
@@ -29,19 +24,28 @@ def profile_username(request, username):
                   {'profile': profile,
                    'page_obj': posts_pagination(posts, request)})
 
+# Новая логика:
+# - проверяем, что пользователь не автор и перенаправляем на profile
+# - получаем форму
+# - проверяем её валидность и записываем
+# - снова перенаправляем на profile
+# - возвращаем render
+
+# в шаблоне profile нет аргумента в ссылке на редактирование профиля!!!
+# Оставляю как было.
 
 def edit_profile_username(request):
     instance = get_object_or_404(
         User,
         username=request.user.username,
     )
-    form = ProfileForm(request.POST or None, instance=instance)      # не понял комментария(
+    form = ProfileForm(request.POST or None, instance=instance)
     context = {'form': form}
     if form.is_valid():
         form.save()
 
     return render(request, 'blog/user.html', context)
-
+#----------------------------------------------------------------------------
 
 def index(request):
     return render(
@@ -72,7 +76,7 @@ def post_detail(request, post_id):
         )
     context = {'post': post,
                'form': CommentForm(),
-               'comments': post.comments.select_related('author')} # переделать ключ на page_obj , чтобы сделать пагинацию, но для этого надо поправить шаблон
+               'comments': post.comments.select_related('author')} # переделать ключ на page_obj , чтобы сделать пагинацию, но для этого надо поправить шаблон!
 
     return render(request, 'blog/detail.html', context)
 
@@ -107,20 +111,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-# class OnlyAuthorMixin(UserPassesTestMixin):
-
-#     def test_func(self):
-#         return self.get_object().author == self.request.user
-
-#     def handle_no_permission(self):
-#         return redirect('blog:post_detail', self.get_object().id)
-
-
 class PostUpdateView(PostMixin, UpdateView):
-    # model = Post
-    # pk_url_kwarg = 'post_id'
-    # form_class = PostForm
-    # template_name = 'blog/create.html'
     
     def get_success_url(self):
         return reverse('blog:post_detail', kwargs={'post_id': self.object.pk})
@@ -128,63 +119,19 @@ class PostUpdateView(PostMixin, UpdateView):
 
 class PostDeleteView(PostMixin, DeleteView):
     pass
-    # model = Post
-    # template_name = 'blog/create.html'
-
-    # def get_success_url(self):
-    #     return reverse('blog:profile', kwargs={'username': self.object.author})
-
+    
 
 class CommentCreateView(CommentMixin, CreateView):
-    # cur_post = None
-    # model = Comment
-    # form_class = CommentForm
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     self.cur_post = get_object_or_404(Post, pk=kwargs['post_id'])
-    #     return super().dispatch(request, *args, **kwargs)
-
+    
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = self.cur_post
         return super().form_valid(form)
 
-    # def get_success_url(self):
-    #     return reverse('blog:post_detail',
-    #                    kwargs={'post_id': self.cur_post.pk})
-
-
+    
 class CommentUpdateView(CommentMixin, OnlyAuthorMixin, UpdateView):
     pass
-    # cur_post = None
-    # model = Comment
-    # pk_url_kwarg = 'comment_id'
-    # form_class = CommentForm
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     self.cur_post = get_object_or_404(Post, pk=kwargs['post_id'])
-    #     return super().dispatch(request, *args, **kwargs)
-
-    # template_name = 'blog/comment.html'
-
-    # def get_success_url(self):
-    #     return reverse('blog:post_detail',
-    #                    kwargs={'post_id': self.cur_post.pk})
-
+    
 
 class CommentDeleteView(CommentMixin, OnlyAuthorMixin, DeleteView):
     pass
-    # cur_post = None
-    # model = Comment
-    # pk_url_kwarg = 'comment_id'
-    # form_class = CommentForm
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     self.cur_post = get_object_or_404(Post, pk=kwargs['post_id'])
-    #     return super().dispatch(request, *args, **kwargs)
-
-    # template_name = 'blog/comment.html'
-
-    # def get_success_url(self):
-    #     return reverse('blog:post_detail',
-    #                    kwargs={'post_id': self.cur_post.pk})

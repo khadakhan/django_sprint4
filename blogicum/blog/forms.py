@@ -23,7 +23,7 @@ class PostForm(forms.ModelForm):
             'author',
         )
         widgets = {
-            'pub_date': forms.DateTimeInput(format='Y-%m-%d %H:%M:%S', # добавил формат, но автозаполнения нет
+            'pub_date': forms.DateTimeInput(format='Y-%m-%d %H:%M:%S',
                                             attrs={'type': 'datetime-local'})
 
         }
