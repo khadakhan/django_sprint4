@@ -19,7 +19,7 @@ urlpatterns = [
          include('django.contrib.auth.urls')),
     path( 
         'auth/registration/',
-        CreateView.as_view(
+        CreateView.as_view(               # не удалось вынести в отдельный файл view
             template_name='registration/registration_form.html',
             form_class=UserCreationForm,
             success_url=reverse_lazy('blog:index'),
