@@ -76,7 +76,7 @@ def post_detail(request, post_id):
         )
     context = {'post': post,
                'form': CommentForm(),
-               'comments': post.comments.select_related('author')} # переделать ключ на page_obj , чтобы сделать пагинацию, но для этого надо поправить шаблон!
+               'comments': post.comments.select_related('author')}
 
     return render(request, 'blog/detail.html', context)
 

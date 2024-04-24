@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
-# from django.utils import timezone
-# from datetime import datetime
+
 
 from core.models import CreatedAt, IsPublishedCreatedAt
 from .const import CHAR_LENGTH, NAME_LENGTH_LIMIT
