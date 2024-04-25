@@ -20,10 +20,12 @@ class PostMixin(LoginRequiredMixin, OnlyAuthorMixin):
     template_name = 'blog/create.html'
 
     def handle_no_permission(self):
-        return redirect('blog:post_detail', self.get_object().id)
+        return redirect('blog:post_detail',
+                        self.kwargs[self.pk_url_kwarg])
 
     def get_success_url(self):
-        return reverse('blog:profile', kwargs={'username': self.object.author})
+        return reverse('blog:profile',
+                       kwargs={'username': self.object.author.username})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,16 +34,11 @@ class PostMixin(LoginRequiredMixin, OnlyAuthorMixin):
 
 
 class CommentMixin(LoginRequiredMixin):
-    cur_post = None
     model = Comment
     form_class = CommentForm
     pk_url_kwarg = 'comment_id'
     template_name = 'blog/comment.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        self.cur_post = get_object_or_404(Post, pk=kwargs['post_id'])
-        return super().dispatch(request, *args, **kwargs)
-
     def get_success_url(self):
         return reverse('blog:post_detail',
-                       kwargs={'post_id': self.cur_post.pk})
+                       kwargs={'post_id': self.kwargs['post_id']})
